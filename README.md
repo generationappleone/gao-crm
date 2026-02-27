@@ -73,7 +73,7 @@ pnpm install
 ### 2. Create Database
 
 ```sql
-CREATE DATABASE gaocrm;
+CREATE DATABASE *******;
 ```
 
 ### 3. Configure Environment
@@ -85,9 +85,9 @@ database: {
     driver: 'postgres',
     host: 'localhost',
     port: 5432,
-    database: 'gaocrm',
-    user: 'postgres',
-    password: process.env.DB_PASSWORD ?? 'root',
+    database: '*******',
+    user: '*******',
+    password: '*******',
 }
 ```
 

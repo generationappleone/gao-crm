@@ -1,0 +1,67 @@
+# ================================================
+# GAO CRM — .gitignore
+# ================================================
+
+# ---- Dependencies ----
+node_modules/
+.pnpm-store/
+
+# ---- Build output ----
+dist/
+build/
+*.tsbuildinfo
+
+# ---- Environment & secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Logs ----
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+migrate-result.log
+app-output.log
+tsc-errors.log
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+
+# ---- IDE / Editor ----
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ---- Testing ----
+coverage/
+.nyc_output/
+*.lcov
+
+# ---- Database ----
+*.sql.bak
+*.dump
+
+# ---- Agent / AI context ----
+.agent/context/AGENT_LOCK
+.agent/context/ACTIVE_TASK.md
+
+# ---- Misc ----
+*.pid
+*.seed
+*.pid.lock
+.cache/
+tmp/
+temp/
