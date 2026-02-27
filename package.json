@@ -1,0 +1,29 @@
+{
+    "name": "gao-crm",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "tsx watch src/app.ts",
+        "start": "node dist/app.js",
+        "build": "tsc --project tsconfig.json",
+        "migrate": "tsx src/migrate.ts",
+        "migrate:fresh": "tsx src/migrate.ts --fresh",
+        "seed": "tsx src/seed.ts"
+    },
+    "dependencies": {
+        "@gao/core": "workspace:*",
+        "@gao/http": "workspace:*",
+        "@gao/orm": "workspace:*",
+        "@gao/view": "workspace:*",
+        "@gao/ui": "workspace:*",
+        "@gao/security": "workspace:*",
+        "pg": "^8.13.0"
+    },
+    "devDependencies": {
+        "tsx": "^4.19.0",
+        "pino-pretty": "^13.0.0",
+        "typescript": "^5.7.0",
+        "@types/pg": "^8.11.0"
+    }
+}
