@@ -20,6 +20,7 @@ let Company = class Company extends Model {
     country;
     employee_count;
     annual_revenue;
+    notes;
 };
 __decorate([
     Column(),
@@ -69,6 +70,10 @@ __decorate([
     Column(),
     __metadata("design:type", Number)
 ], Company.prototype, "annual_revenue", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Company.prototype, "notes", void 0);
 __decorate([
     Column(),
     __metadata("design:type", String)

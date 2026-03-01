@@ -30,8 +30,13 @@ export class DealApiController {
     @Post('/')
     async create(req: GaoRequest, res: GaoResponse) {
         const body = req.body as Record<string, unknown>;
-        if (!body.title || !body.contact_id || !body.stage_id || !body.owner_id) {
-            return res.error(422, 'VALIDATION', 'title, contact_id, stage_id, and owner_id are required');
+        if (!body.title || !body.stage_id) {
+            return res.error(422, 'VALIDATION', 'title and stage_id are required');
+        }
+        // Auto-set owner_id from logged-in user if not provided
+        if (!body.owner_id) {
+            const user = req.user as Record<string, unknown> | undefined;
+            body.owner_id = user?.id ?? null;
         }
         const deal = await dealService.create(body);
         return res.status(201).json(deal.toJSON());

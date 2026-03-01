@@ -1,0 +1,2 @@
+import { Model, Table, Column } from '@gao/orm';
+@Table('project_tasks') export class ProjectTask extends Model { @Column() declare id: string; @Column() project_id!: string; @Column() parent_id?: string; @Column() assignee_id?: string; @Column() title!: string; @Column() description?: string; @Column() status!: string; @Column() priority!: string; @Column() due_date?: string; @Column() completed_at?: string; @Column() sort_order!: number; @Column() declare created_at: string; @Column() declare updated_at: string; }

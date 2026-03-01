@@ -1,1 +1,1 @@
-{"version":3,"file":"006_create_activities.d.ts","sourceRoot":"","sources":["../../src/migrations/006_create_activities.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAkB,MAAM,UAAU,CAAC;AAE1D,eAAO,MAAM,qBAAqB,EAAE,SAoCnC,CAAC"}
+{"version":3,"file":"006_create_activities.d.ts","sourceRoot":"","sources":["../../src/migrations/006_create_activities.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAkB,MAAM,UAAU,CAAC;AAE1D,eAAO,MAAM,qBAAqB,EAAE,SAmCnC,CAAC"}

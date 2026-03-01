@@ -1,15 +1,37 @@
 import { Contact } from '../models/contact.model.js';
 export class ContactService {
     async list(params, search, status, ownerId) {
-        let query = Contact.where('id', '!=', '').whereNull('deleted_at');
-        if (search) {
-            query = query.where('first_name', 'LIKE', `%${search}%`);
-        }
+        let query = Contact.where('deleted_at', 'IS', null);
         if (status) {
             query = query.where('status', status);
         }
         if (ownerId) {
             query = query.where('owner_id', ownerId);
+        }
+        // If search is provided, do application-level multi-field filtering
+        // because the ORM doesn't support OR queries
+        if (search) {
+            const term = search.toLowerCase();
+            const allContacts = await query.orderBy('created_at', 'DESC').get();
+            const filtered = allContacts.filter(c => {
+                const fullName = `${c.first_name} ${c.last_name}`.toLowerCase();
+                return fullName.includes(term)
+                    || (c.email ?? '').toLowerCase().includes(term)
+                    || (c.phone ?? '').toLowerCase().includes(term)
+                    || (c.position ?? '').toLowerCase().includes(term);
+            });
+            const total = filtered.length;
+            const start = (params.page - 1) * params.perPage;
+            const paged = filtered.slice(start, start + params.perPage);
+            return {
+                contacts: paged,
+                meta: {
+                    page: params.page,
+                    per_page: params.perPage,
+                    total,
+                    total_pages: Math.ceil(total / params.perPage),
+                },
+            };
         }
         const result = await query.orderBy('created_at', 'DESC').paginate(params.page, params.perPage);
         return {

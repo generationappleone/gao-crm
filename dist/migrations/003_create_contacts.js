@@ -23,15 +23,14 @@ export const CreateContactsTable = {
                 deleted_at TIMESTAMPTZ,
 
                 CONSTRAINT ck_contacts_status CHECK (status IN ('lead', 'prospect', 'customer', 'churned'))
-            );
-
-            CREATE UNIQUE INDEX uq_contacts_email ON contacts (email) WHERE deleted_at IS NULL AND email IS NOT NULL;
-            CREATE INDEX idx_contacts_company ON contacts (company_id) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_contacts_owner ON contacts (owner_id) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_contacts_status ON contacts (status) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_contacts_name ON contacts (last_name, first_name) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_contacts_created ON contacts (created_at DESC) WHERE deleted_at IS NULL;
+            )
         `);
+        await driver.execute('CREATE UNIQUE INDEX uq_contacts_email ON contacts (email) WHERE deleted_at IS NULL AND email IS NOT NULL');
+        await driver.execute('CREATE INDEX idx_contacts_company ON contacts (company_id) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_contacts_owner ON contacts (owner_id) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_contacts_status ON contacts (status) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_contacts_name ON contacts (last_name, first_name) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_contacts_created ON contacts (created_at DESC) WHERE deleted_at IS NULL');
     },
     async down(driver) {
         await driver.execute('DROP TABLE IF EXISTS contacts CASCADE');

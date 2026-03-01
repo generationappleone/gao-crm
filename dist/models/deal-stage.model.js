@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { Model, Table, Column } from '@gao/orm';
 let DealStage = class DealStage extends Model {
+    pipeline_id;
     name;
     slug;
     display_order;
@@ -20,6 +21,10 @@ __decorate([
     Column(),
     __metadata("design:type", String)
 ], DealStage.prototype, "id", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], DealStage.prototype, "pipeline_id", void 0);
 __decorate([
     Column(),
     __metadata("design:type", String)
@@ -52,6 +57,10 @@ __decorate([
     Column(),
     __metadata("design:type", String)
 ], DealStage.prototype, "updated_at", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", Object)
+], DealStage.prototype, "deleted_at", void 0);
 DealStage = __decorate([
     Table('deal_stages')
 ], DealStage);

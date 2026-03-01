@@ -7,19 +7,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Get } from '@gao/http';
+import { Controller, Get } from '@gao/http';
 import { DashboardService } from '../../services/dashboard.service.js';
 const dashboardService = new DashboardService();
-export class DashboardApiController {
+let DashboardApiController = class DashboardApiController {
     async stats(_req, res) {
         const stats = await dashboardService.getStats();
         return res.json(stats);
     }
-}
+};
 __decorate([
-    Get('/api/dashboard/stats'),
+    Get('/stats'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Function, Function]),
     __metadata("design:returntype", Promise)
 ], DashboardApiController.prototype, "stats", null);
+DashboardApiController = __decorate([
+    Controller('/api/dashboard')
+], DashboardApiController);
+export { DashboardApiController };
 //# sourceMappingURL=dashboard.api.controller.js.map

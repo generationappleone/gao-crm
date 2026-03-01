@@ -17,6 +17,13 @@ export interface DashboardStats {
         value: number;
     }>;
     recentActivities: Activity[];
+    emailsSent: number;
+    emailsOpened: number;
+    emailOpenRate: number;
+    quotationsSent: number;
+    quotationsAccepted: number;
+    quotationValue: number;
+    upcomingEvents: number;
 }
 export declare class DashboardService {
     getStats(): Promise<DashboardStats>;

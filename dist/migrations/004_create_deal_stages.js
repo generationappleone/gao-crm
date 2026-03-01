@@ -14,10 +14,9 @@ export const CreateDealStagesTable = {
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
                 CONSTRAINT uq_deal_stages_slug UNIQUE (slug)
-            );
-
-            CREATE INDEX idx_deal_stages_order ON deal_stages (display_order);
+            )
         `);
+        await driver.execute('CREATE INDEX idx_deal_stages_order ON deal_stages (display_order)');
     },
     async down(driver) {
         await driver.execute('DROP TABLE IF EXISTS deal_stages CASCADE');

@@ -127,7 +127,7 @@ export class AuthController {
             errorEl.style.display = 'none';
 
             try {
-                const res = await fetch('/api/auth/login', {
+                const res = await fetch('/gaocrm/admin-panel/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -139,7 +139,7 @@ export class AuthController {
                 if (!res.ok) {
                     throw new Error(data.error?.message || 'Login failed');
                 }
-                window.location.href = '/';
+                window.location.href = '/gaocrm/admin-panel/';
             } catch (err) {
                 errorEl.textContent = err.message;
                 errorEl.style.display = 'block';

@@ -1,0 +1,2 @@
+import { Model, Table, Column } from '@gao/orm';
+@Table('messages') export class Message extends Model { @Column() declare id: string; @Column() channel_id!: string; @Column() sender_id!: string; @Column() content!: string; @Column() message_type!: string; @Column() parent_id?: string; @Column() is_edited!: boolean; @Column() is_pinned!: boolean; @Column() attachments?: string; @Column() declare created_at: string; @Column() declare updated_at: string; @Column() declare deleted_at: string | undefined; }

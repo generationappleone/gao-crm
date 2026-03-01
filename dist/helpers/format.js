@@ -3,12 +3,40 @@
  */
 export function formatCurrency(value, currency = 'IDR') {
     if (currency === 'IDR') {
-        return `Rp ${value.toLocaleString('id-ID')}`;
+        // Indonesian Rupiah: no decimals, dot as thousand separator
+        // Example: 24000000 → "Rp 24.000.000"
+        const rounded = Math.round(value);
+        const formatted = formatIDR(rounded);
+        return `Rp ${formatted}`;
     }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
+    // For other currencies, try Intl, fallback to manual
+    try {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
+    }
+    catch {
+        return `${currency} ${formatIDR(Math.round(value))}`;
+    }
+}
+/**
+ * Format a number with dots as thousand separators (Indonesian style).
+ * Example: 24000000 → "24.000.000"
+ */
+function formatIDR(num) {
+    const isNegative = num < 0;
+    const abs = Math.abs(num).toString();
+    let result = '';
+    let count = 0;
+    for (let i = abs.length - 1; i >= 0; i--) {
+        if (count > 0 && count % 3 === 0) {
+            result = '.' + result;
+        }
+        result = abs[i] + result;
+        count++;
+    }
+    return isNegative ? '-' + result : result;
 }
 export function formatNumber(value) {
-    return value.toLocaleString('id-ID');
+    return formatIDR(Math.round(value));
 }
 export function formatDate(dateString) {
     if (!dateString)

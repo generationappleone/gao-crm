@@ -11,13 +11,27 @@ import { AuthService } from '../services/auth.service.js';
 const authService = new AuthService();
 
 // Routes that don't require authentication
-const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout', '/health'];
+// Exact paths or specific prefixes — NOT broad prefixes that expose admin CRUD
+const PUBLIC_EXACT = ['/gaocrm/admin-panel/login', '/gaocrm/admin-panel/api/auth/login', '/gaocrm/admin-panel/api/auth/logout', '/gaocrm/admin-panel/health', '/health'];
+const PUBLIC_PREFIXES = [
+    '/gaocrm/admin-panel/api/email/track',                 // Open tracking pixel
+    '/gaocrm/admin-panel/api/tracking',                    // Web tracking (visitor JS snippet)
+    '/gaocrm/admin-panel/api/forms',                       // Public form submission + embed
+    '/gaocrm/admin-panel/api/chat/sessions',              // Chat start + visitor messages (POST only gated in controller)
+    '/gaocrm/admin-panel/api/kb/articles/slug/',           // Public KB article by slug
+    '/gaocrm/admin-panel/api/csat/surveys/',              // Public CSAT response submission (POST /:id/respond)
+    '/gaocrm/admin-panel/api/portal/auth/',               // Client portal login (separate auth)
+    '/gaocrm/admin-panel/api/payments/webhook',           // Payment gateway webhooks (Midtrans, Xendit, Stripe)
+];
 
 export function authMiddleware(): MiddlewareHandler {
     return async (req: GaoRequest, res: GaoResponse, next) => {
         // Skip auth for public routes
         const pathname = req.url.pathname;
-        if (PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))) {
+        if (PUBLIC_EXACT.includes(pathname)) {
+            return next();
+        }
+        if (PUBLIC_PREFIXES.some(p => pathname.startsWith(p))) {
             return next();
         }
 
@@ -38,7 +52,7 @@ export function authMiddleware(): MiddlewareHandler {
             // For HTML pages, redirect to login
             const acceptHeader = req.header('accept') ?? '';
             if (acceptHeader.includes('text/html')) {
-                return res.redirect('/login');
+                return res.redirect('/gaocrm/admin-panel/login');
             }
             return res.error(401, 'UNAUTHORIZED', 'Authentication required');
         }
@@ -49,7 +63,7 @@ export function authMiddleware(): MiddlewareHandler {
 
             if (!user || !user.is_active) {
                 if ((req.header('accept') ?? '').includes('text/html')) {
-                    return res.redirect('/login');
+                    return res.redirect('/gaocrm/admin-panel/login');
                 }
                 return res.error(401, 'UNAUTHORIZED', 'Invalid or expired token');
             }
@@ -65,7 +79,7 @@ export function authMiddleware(): MiddlewareHandler {
             return next();
         } catch {
             if ((req.header('accept') ?? '').includes('text/html')) {
-                return res.redirect('/login');
+                return res.redirect('/gaocrm/admin-panel/login');
             }
             return res.error(401, 'UNAUTHORIZED', 'Invalid or expired token');
         }

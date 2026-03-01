@@ -12,6 +12,7 @@ export declare class Company extends Model {
     country?: string;
     employee_count?: number;
     annual_revenue?: number;
+    notes?: string;
     created_at: string;
     updated_at: string;
     deleted_at: string | undefined;

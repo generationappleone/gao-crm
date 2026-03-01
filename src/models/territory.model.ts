@@ -1,0 +1,2 @@
+import { Model, Table, Column } from '@gao/orm';
+@Table('territories') export class Territory extends Model { @Column() declare id: string; @Column() name!: string; @Column() parent_id?: string; @Column() manager_id?: string; @Column() description?: string; @Column() region?: string; @Column() country?: string; @Column() is_active!: boolean; @Column() declare created_at: string; @Column() declare updated_at: string; }

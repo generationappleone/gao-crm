@@ -1,1 +1,1 @@
-{"version":3,"file":"002_create_companies.d.ts","sourceRoot":"","sources":["../../src/migrations/002_create_companies.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAkB,MAAM,UAAU,CAAC;AAE1D,eAAO,MAAM,oBAAoB,EAAE,SAgClC,CAAC"}
+{"version":3,"file":"002_create_companies.d.ts","sourceRoot":"","sources":["../../src/migrations/002_create_companies.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAkB,MAAM,UAAU,CAAC;AAE1D,eAAO,MAAM,oBAAoB,EAAE,SA+BlC,CAAC"}

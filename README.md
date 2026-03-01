@@ -1,3 +1,5 @@
+# GAO CRM
+
 <p align="center">
   <img src="https://img.shields.io/badge/GAO_CRM-v1.0.0-6366f1?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjIiLz48cGF0aCBkPSJNMyA5aDE4Ii8+PHBhdGggZD0iTTkgMjFWOSIvPjwvc3ZnPg==&logoColor=white" alt="GAO CRM" />
   <img src="https://img.shields.io/badge/TypeScript-5.9+-3178c6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
@@ -5,48 +7,60 @@
   <img src="https://img.shields.io/badge/PostgreSQL-16+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
 </p>
 
-# GAO CRM
-
-A full-featured **Customer Relationship Management** application built with the [GAO Framework](https://github.com/nicepkg/gao). Manage contacts, companies, deals, activities, and track your sales pipeline — all from a clean, modern admin dashboard.
+<p align="center">
+  A comprehensive, full-featured <strong>Customer Relationship Management</strong> platform built with the <a href="https://github.com/nicepkg/gao">GAO Framework</a>.<br/>
+  Manage contacts, companies, deals, invoices, quotations, projects, campaigns, and more — all from a modern, glassmorphism-inspired admin dashboard.
+</p>
 
 ---
 
 ## ✨ Features
 
-### Core Modules
-- **📊 Dashboard** — Real-time stats, sales pipeline visualization, revenue metrics, win rate, and recent activity feed
-- **👥 Contacts** — Full CRUD with search, status filtering (Lead → Prospect → Customer → Churned), and company association
+### 🏢 CRM Core
+- **📊 Dashboard** — Real-time KPIs, sales pipeline visualization, revenue metrics, win rate, and activity feed
+- **👥 Contacts** — Full contact management with status lifecycle (Lead → Prospect → Customer → Churned), search, and company linking
 - **🏢 Companies** — Company profiles with related contacts, deals, employee count, and revenue tracking
-- **💰 Deals Pipeline** — Visual pipeline management (Lead → Qualified → Proposal → Negotiation → Won/Lost) with stage filters
+- **💰 Pipeline** — Visual deal pipeline (Lead → Qualified → Proposal → Negotiation → Won/Lost) with drag-and-drop stages
 - **📋 Activities** — Log calls, meetings, emails, and tasks linked to contacts and deals
-- **📝 Notes** — Polymorphic note system for contacts and deals with inline creation
-- **🏷️ Tags** — Flexible tagging system for contacts and deals
+
+### 💼 Sales & Finance
+- **📝 Quotations** — Create, send, and track quotations with line items, discounts, and tax calculation
+- **🧾 Invoices** — Invoice generation with status management (Draft → Pending → Sent → Paid), recurring invoices (monthly), prorate support, and payment recording
+- **📦 Products** — Product catalog with SKU, pricing, and inventory tracking
+- **💲 Price Lists** — Tiered and custom pricing per customer segment
+
+### 📣 Marketing
+- **📧 Email Hub** — Email templates, tracking, and link click analytics
+- **📢 Campaigns** — Multi-channel campaign management with recipient tracking
+- **📝 Forms** — Drag-and-drop form builder with field customization and submission tracking
+- **🌐 Landing Pages** — Template-based landing page builder (Product Showcase, Lead Capture, Event Registration, Quiz + Leaderboard, Survey Form, and more)
+- **🔍 Web Tracking** — Visitor tracking and behavior analytics
+
+### 🛠️ Operations
+- **📂 Projects** — Project management with task boards, status workflows, and team assignment
+- **📅 Calendar** — Event management with attendees and reminders
+- **🎫 Tickets** — Support ticketing system with CSAT surveys
+- **💬 Live Chat** — Real-time customer messaging
+- **📢 Announcements** — Internal team announcements
+- **📚 Knowledge Base** — Article management for self-service support
+
+### ⚙️ Administration
+- **🤖 AI Insights** — AI-powered analytics and conversation intelligence
+- **📊 Reports** — Win/loss analysis, revenue reports, and performance dashboards
+- **🔒 Audit Log** — Complete audit trail for security and compliance
+- **⚙️ Settings** — System configuration, user management, and preferences
+- **🔗 Plugins** — Extensible plugin architecture
+- **🔄 Automations** — Workflow automation with custom triggers and actions
+- **✅ Approvals** — Multi-level approval chains for quotations, deals, and invoices
 
 ### Technical Highlights
-- **🔐 Authentication** — JWT-based auth with Argon2 password hashing
+- **🔐 JWT Authentication** with Argon2 password hashing
 - **🛡️ RBAC** — Role-based access control (Admin, Sales Manager, Sales Rep)
-- **🗄️ Active Record ORM** — Type-safe database access with soft delete support
-- **🎨 Server-Side Rendered** — Fast, glassmorphism-inspired admin UI via `@gao/ui`
-- **📄 RESTful API** — Full JSON API for all entities alongside HTML pages
-
----
-
-## 📸 Screenshots
-
-### Dashboard
-> Stats cards, sales pipeline stages, win/loss summary, and recent activity feed.
-
-![Dashboard](docs/screenshots/dashboard.png)
-
-### Contacts
-> Searchable contact list with avatar initials, status badges, and quick actions.
-
-![Contacts](docs/screenshots/contacts.png)
-
-### Deals Pipeline
-> Pipeline view with stage filters, deal values, and probability tracking.
-
-![Deals](docs/screenshots/deals.png)
+- **🗄️ Active Record ORM** — Type-safe database access with 70+ models and soft delete
+- **🎨 Server-Side Rendered** — Fast, glassmorphism dark theme admin UI
+- **📄 RESTful API** — Full JSON API for all entities with standard envelope format
+- **🔄 Recurring Invoices** — Monthly auto-billing with configurable billing day
+- **📊 Prorate Calculation** — Mid-month subscription adjustment
 
 ---
 
@@ -73,21 +87,21 @@ pnpm install
 ### 2. Create Database
 
 ```sql
-CREATE DATABASE *******;
+CREATE DATABASE your_database_name;
 ```
 
 ### 3. Configure Environment
 
-Database configuration is in `gao-crm/gao.config.ts`. Update the credentials if needed:
+Database configuration is in `gao-crm/gao.config.ts`. Update the credentials as needed:
 
 ```typescript
 database: {
     driver: 'postgres',
     host: 'localhost',
     port: 5432,
-    database: '*******',
-    user: '*******',
-    password: '*******',
+    database: '********',
+    user: '********',
+    password: process.env.DB_PASSWORD ?? '********',
 }
 ```
 
@@ -110,13 +124,7 @@ pnpm migrate
 pnpm seed
 ```
 
-This creates:
-- **3 users** (admin, sales manager, sales rep)
-- **5 companies** across various industries
-- **12 contacts** with different statuses
-- **10 deals** across all pipeline stages
-- **12 activities** (calls, meetings, emails, tasks)
-- **5 tags** (Hot Lead, VIP, Follow Up, Pending, Archived)
+This creates sample data including users, companies, contacts, deals, activities, tags, products, quotations, invoices, and more for a complete demo environment.
 
 ### 6. Start Development Server
 
@@ -128,10 +136,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### 7. Login
 
-| Field    | Value              |
-|----------|--------------------|
-| Email    | `admin@gaocrm.com` |
-| Password | `password123`      |
+Use the credentials created by the seeder. Default accounts are available for Admin, Sales Manager, and Sales Rep roles.
+
+> ⚠️ **Important:** Change all default passwords before deploying to production.
 
 ---
 
@@ -145,55 +152,33 @@ gao-crm/
 └── src/
     ├── app.ts                       # Main entry point & server bootstrap
     │
-    ├── controllers/                 # Route handlers
+    ├── controllers/                 # Route handlers (31 controllers)
     │   ├── auth.controller.ts       # Login/logout pages
-    │   ├── dashboard.controller.ts  # Dashboard page
-    │   ├── contact.controller.ts    # Contact list, detail, edit pages
-    │   ├── company.controller.ts    # Company list, detail, edit pages
-    │   ├── deal.controller.ts       # Deal pipeline, detail, edit pages
-    │   ├── activity.controller.ts   # Activity list page
+    │   ├── dashboard.controller.ts  # Dashboard with KPIs
+    │   ├── contact.controller.ts    # Contact CRUD
+    │   ├── company.controller.ts    # Company CRUD
+    │   ├── pipeline.controller.ts   # Deal pipeline visualization
+    │   ├── deal.controller.ts       # Deal management
+    │   ├── product.controller.ts    # Product catalog
+    │   ├── quotation.controller.ts  # Quotation management
+    │   ├── invoice.controller.ts    # Invoice management (recurring, prorate)
+    │   ├── project.controller.ts    # Project management
+    │   ├── calendar.controller.ts   # Calendar events
+    │   ├── email-hub.controller.ts  # Email management
+    │   ├── campaign.controller.ts   # Campaign management
+    │   ├── form.controller.ts       # Form builder
+    │   ├── landing-page.controller.ts # Landing page builder
+    │   ├── ticket.controller.ts     # Support tickets
+    │   ├── live-chat.controller.ts  # Live chat
+    │   ├── report.controller.ts     # Reports & analytics
     │   └── api/                     # JSON API endpoints
-    │       ├── auth.api.controller.ts
-    │       ├── contact.api.controller.ts
-    │       ├── company.api.controller.ts
-    │       ├── deal.api.controller.ts
-    │       ├── activity.api.controller.ts
-    │       ├── note.api.controller.ts
-    │       ├── tag.api.controller.ts
-    │       └── dashboard.api.controller.ts
     │
-    ├── models/                      # Active Record models
-    │   ├── user.model.ts
-    │   ├── contact.model.ts
-    │   ├── company.model.ts
-    │   ├── deal.model.ts
-    │   ├── deal-stage.model.ts
-    │   ├── activity.model.ts
-    │   ├── note.model.ts
-    │   └── tag.model.ts
-    │
+    ├── models/                      # Active Record models (70+ models)
     ├── services/                    # Business logic layer
-    │   ├── auth.service.ts          # Authentication (JWT + Argon2)
-    │   ├── contact.service.ts
-    │   ├── company.service.ts
-    │   ├── deal.service.ts
-    │   ├── activity.service.ts
-    │   ├── note.service.ts
-    │   ├── tag.service.ts
-    │   └── dashboard.service.ts     # Dashboard aggregation queries
-    │
-    ├── middleware/
-    │   └── auth.middleware.ts       # JWT verification middleware
-    │
-    ├── migrations/                  # Database migration files (001-010)
-    ├── helpers/                     # Utility functions
-    │   ├── escape.ts                # HTML escaping (XSS prevention)
-    │   ├── format.ts                # Currency & date formatting
-    │   └── pagination.ts            # Pagination helper
-    │
-    ├── views/
-    │   └── renderer.ts              # Admin template layout renderer
-    │
+    ├── middleware/                   # Auth, RBAC, rate limiting
+    ├── migrations/                  # Database migrations (001-074)
+    ├── helpers/                     # Utility functions (escape, format, pagination)
+    ├── views/                       # Admin template renderer
     ├── migrate.ts                   # Migration runner script
     └── seed.ts                      # Database seeder
 ```
@@ -202,26 +187,9 @@ gao-crm/
 
 ## 🗄️ Database Schema
 
-### Entity Relationship
+The application uses **74 migration files** creating a comprehensive schema. Key table groups:
 
-```
-users (1) ──────── (N) contacts
-users (1) ──────── (N) deals
-users (1) ──────── (N) activities
-companies (1) ──── (N) contacts
-companies (1) ──── (N) deals
-contacts (1) ───── (N) deals
-contacts (1) ───── (N) activities
-deals (1) ──────── (N) activities
-deal_stages (1) ── (N) deals
-contacts (M) ───── (N) tags  [via contacts_tags]
-deals (M) ──────── (N) tags  [via deals_tags]
-contacts (1) ───── (N) notes
-deals (1) ──────── (N) notes
-```
-
-### Tables
-
+### Core CRM
 | Table | Description |
 |-------|-------------|
 | `users` | Application users with roles (admin, sales_manager, sales_rep) |
@@ -232,14 +200,41 @@ deals (1) ──────── (N) notes
 | `activities` | Logged interactions (call, meeting, email, task) |
 | `notes` | Polymorphic notes on contacts and deals |
 | `tags` | Color-coded labels for categorization |
-| `contacts_tags` | Junction table for contact-tag M:N relationship |
-| `deals_tags` | Junction table for deal-tag M:N relationship |
+
+### Sales & Finance
+| Table | Description |
+|-------|-------------|
+| `products` | Product catalog with SKU, pricing, categories |
+| `price_lists` / `price_list_items` | Custom pricing tiers |
+| `quotations` / `quotation_items` | Quotation management with line items |
+| `invoices` / `invoice_items` | Invoice management with recurring & prorate support |
+| `payments` | Payment records linked to invoices |
+
+### Marketing & Engagement
+| Table | Description |
+|-------|-------------|
+| `email_templates` / `email_messages` | Email system with tracking |
+| `campaigns` / `campaign_recipients` | Campaign management |
+| `forms` / `form_fields` / `form_submissions` | Form builder data |
+| `landing_pages` | Landing page templates |
+| `tracking_events` / `tracking_sessions` | Web analytics |
+
+### Operations & Support
+| Table | Description |
+|-------|-------------|
+| `projects` / `project_tasks` | Project management |
+| `calendar_events` | Calendar system |
+| `tickets` | Support ticketing |
+| `live_chat_sessions` / `live_chat_messages` | Real-time chat |
+| `knowledge_base_articles` | Knowledge base |
 
 All tables use **UUID primary keys**, **timestamp audit columns** (`created_at`, `updated_at`), and **soft delete** (`deleted_at`).
 
 ---
 
 ## 🔌 API Reference
+
+All API endpoints are prefixed with `/api/` and require Bearer authentication unless noted otherwise.
 
 ### Authentication
 
@@ -249,75 +244,39 @@ All tables use **UUID primary keys**, **timestamp audit columns** (`created_at`,
 | `POST` | `/api/auth/logout` | Bearer | Logout |
 | `GET` | `/api/auth/me` | Bearer | Current user info |
 
-### Contacts
+### CRM Resources
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/contacts` | Bearer | List (paginated, searchable) |
-| `POST` | `/api/contacts` | Bearer | Create contact |
-| `GET` | `/api/contacts/:id` | Bearer | Get contact |
-| `PUT` | `/api/contacts/:id` | Bearer | Update contact |
-| `DELETE` | `/api/contacts/:id` | Bearer | Soft delete |
+| Resource | Endpoints | Description |
+|----------|-----------|-------------|
+| **Contacts** | `GET/POST/PUT/DELETE /api/contacts` | Contact CRUD with search & pagination |
+| **Companies** | `GET/POST/PUT/DELETE /api/companies` | Company CRUD |
+| **Deals** | `GET/POST/PUT/DELETE /api/deals` | Deal management with stage transitions |
+| **Activities** | `GET/POST/PUT/DELETE /api/activities` | Activity logging |
+| **Notes** | `GET/POST/PUT/DELETE /api/notes` | Polymorphic notes |
+| **Tags** | `GET/POST/PUT/DELETE /api/tags` | Tag management |
 
-### Companies
+### Sales & Finance
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/companies` | Bearer | List (paginated) |
-| `POST` | `/api/companies` | Bearer | Create company |
-| `GET` | `/api/companies/:id` | Bearer | Get company |
-| `PUT` | `/api/companies/:id` | Bearer | Update company |
-| `DELETE` | `/api/companies/:id` | Bearer | Soft delete |
+| Resource | Endpoints | Description |
+|----------|-----------|-------------|
+| **Products** | `GET/POST/PUT/DELETE /api/products` | Product catalog |
+| **Quotations** | `GET/POST/PUT/DELETE /api/quotations` | Quotation management |
+| **Invoices** | `GET/POST/PATCH/DELETE /api/invoices` | Invoice management with payment recording |
 
-### Deals
+### Other Resources
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/deals` | Bearer | List (filterable by stage) |
-| `POST` | `/api/deals` | Bearer | Create deal |
-| `GET` | `/api/deals/:id` | Bearer | Get deal |
-| `PUT` | `/api/deals/:id` | Bearer | Update deal |
-| `PATCH` | `/api/deals/:id/stage` | Bearer | Move deal to different stage |
-| `DELETE` | `/api/deals/:id` | Bearer | Soft delete |
-
-### Activities
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/activities` | Bearer | List activities |
-| `POST` | `/api/activities` | Bearer | Create activity |
-| `GET` | `/api/activities/:id` | Bearer | Get activity |
-| `PUT` | `/api/activities/:id` | Bearer | Update activity |
-| `PATCH` | `/api/activities/:id/complete` | Bearer | Mark as completed |
-| `DELETE` | `/api/activities/:id` | Bearer | Soft delete |
-
-### Notes
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/notes?notable_type=contact&notable_id=:id` | Bearer | List notes |
-| `POST` | `/api/notes` | Bearer | Create note |
-| `PUT` | `/api/notes/:id` | Bearer | Update note |
-| `DELETE` | `/api/notes/:id` | Bearer | Soft delete |
-
-### Tags
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/tags` | Bearer | List tags |
-| `POST` | `/api/tags` | Bearer | Create tag (admin only) |
-| `PUT` | `/api/tags/:id` | Bearer | Update tag (admin only) |
-| `DELETE` | `/api/tags/:id` | Bearer | Delete tag (admin only) |
-
-### Dashboard
-
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/api/dashboard/stats` | Bearer | Dashboard statistics |
+| Resource | Endpoints | Description |
+|----------|-----------|-------------|
+| **Projects** | `GET/POST/PUT/DELETE /api/projects` | Project management |
+| **Calendar** | `GET/POST/PUT/DELETE /api/calendar-events` | Calendar events |
+| **Forms** | `GET/POST/PUT/DELETE /api/forms` | Form builder |
+| **Campaigns** | `GET/POST/PUT/DELETE /api/campaigns` | Campaign management |
+| **Tickets** | `GET/POST/PUT/DELETE /api/tickets` | Support tickets |
+| **Dashboard** | `GET /api/dashboard/stats` | Dashboard statistics |
 
 ### Response Format
 
-All API responses follow a consistent envelope format:
+All API responses follow the standard GAO envelope format:
 
 ```json
 // Success
@@ -328,7 +287,7 @@ All API responses follow a consistent envelope format:
 
 // Error
 {
-    "error": { "message": "Validation failed", "code": 422 }
+    "error": { "code": "VALIDATION", "message": "Validation failed" }
 }
 ```
 
@@ -345,6 +304,7 @@ All API responses follow a consistent envelope format:
 | SQL Injection | Parameterized queries via `@gao/orm` Query Builder |
 | XSS Prevention | HTML escaping on all rendered output |
 | Rate Limiting | Configurable via `gao.config.ts` |
+| Audit Trail | Complete audit logging for all entity changes |
 | Soft Delete | All data uses `deleted_at` — no hard deletes |
 
 ---
@@ -370,6 +330,7 @@ All API responses follow a consistent envelope format:
 - [TypeScript 5.9+](https://www.typescriptlang.org/) — Type-safe development
 
 ### Core Packages (GAO Workspace)
+
 | Package | Purpose |
 |---------|---------|
 | `@gao/core` | Configuration & lifecycle management |
@@ -386,16 +347,6 @@ All API responses follow a consistent envelope format:
 ### Dev Tools
 - [`tsx`](https://github.com/privatenumber/tsx) — Fast TypeScript execution
 - [`pino-pretty`](https://github.com/pinojs/pino-pretty) — Pretty-printed development logs
-
----
-
-## 👥 Default Users
-
-| Name | Email | Password | Role |
-|------|-------|----------|------|
-| Administrator | `admin@gaocrm.com` | `password123` | `admin` |
-| Sarah Manager | `sarah@gaocrm.com` | `password123` | `sales_manager` |
-| Rudi Sales | `rudi@gaocrm.com` | `password123` | `sales_rep` |
 
 ---
 
@@ -417,9 +368,9 @@ export default defineConfig({
         driver: 'postgres',
         host: 'localhost',
         port: 5432,
-        database: 'gaocrm',
-        user: 'postgres',
-        password: process.env.DB_PASSWORD ?? 'root',
+        database: '********',
+        user: '********',
+        password: process.env.DB_PASSWORD ?? '********',
     },
     security: {
         cors: { origin: '*' },
@@ -432,7 +383,7 @@ export default defineConfig({
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DB_PASSWORD` | `root` | PostgreSQL password |
+| `DB_PASSWORD` | — | PostgreSQL password |
 | `JWT_SECRET` | Auto-generated | Secret for JWT signing |
 
 ---

@@ -1,0 +1,6 @@
+import type { Migration, DatabaseDriver } from '@gao/orm';
+export const CreateProjectTasksTable: Migration = {
+    name: '071_create_project_tasks',
+    async up(d: DatabaseDriver) { await d.execute(`CREATE TABLE project_tasks ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE, parent_id UUID REFERENCES project_tasks(id) ON DELETE SET NULL, assignee_id UUID REFERENCES users(id) ON DELETE SET NULL, title VARCHAR(300) NOT NULL, description TEXT, status VARCHAR(20) NOT NULL DEFAULT 'todo', priority VARCHAR(10) NOT NULL DEFAULT 'medium', due_date DATE, completed_at TIMESTAMPTZ, sort_order INTEGER NOT NULL DEFAULT 0, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), CONSTRAINT ck_pt_status CHECK (status IN ('todo', 'in_progress', 'review', 'done', 'blocked')), CONSTRAINT ck_pt_priority CHECK (priority IN ('low', 'medium', 'high', 'urgent')) )`); await d.execute('CREATE INDEX idx_pt_project ON project_tasks (project_id, sort_order)'); await d.execute('CREATE INDEX idx_pt_assignee ON project_tasks (assignee_id) WHERE status != \'done\''); },
+    async down(d: DatabaseDriver) { await d.execute('DROP TABLE IF EXISTS project_tasks CASCADE'); },
+};

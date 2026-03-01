@@ -17,12 +17,11 @@ export const CreateUsersTable = {
 
                 CONSTRAINT uq_users_email UNIQUE (email),
                 CONSTRAINT ck_users_role CHECK (role IN ('admin', 'sales_manager', 'sales_rep'))
-            );
-
-            CREATE INDEX idx_users_email ON users (email) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_users_name ON users (name) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_users_role ON users (role) WHERE deleted_at IS NULL;
+            )
         `);
+        await driver.execute('CREATE INDEX idx_users_email ON users (email) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_users_name ON users (name) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_users_role ON users (role) WHERE deleted_at IS NULL');
     },
     async down(driver) {
         await driver.execute('DROP TABLE IF EXISTS users CASCADE');

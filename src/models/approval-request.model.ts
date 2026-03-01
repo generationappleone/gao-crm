@@ -1,0 +1,3 @@
+import { Model, Table, Column } from '@gao/orm';
+export type ApprovalStatus = 'pending' | 'in_review' | 'approved' | 'rejected' | 'cancelled';
+@Table('approval_requests') export class ApprovalRequest extends Model { @Column() declare id: string; @Column() chain_id!: string; @Column() entity_type!: string; @Column() entity_id!: string; @Column() requested_by!: string; @Column() current_step!: number; @Column() status!: ApprovalStatus; @Column() approver_id?: string; @Column() approved_at?: string; @Column() rejected_at?: string; @Column() rejection_reason?: string; @Column() declare created_at: string; @Column() declare updated_at: string; }

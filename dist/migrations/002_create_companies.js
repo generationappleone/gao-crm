@@ -18,12 +18,11 @@ export const CreateCompaniesTable = {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 deleted_at TIMESTAMPTZ
-            );
-
-            CREATE INDEX idx_companies_name ON companies (name) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_companies_industry ON companies (industry) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_companies_city ON companies (city) WHERE deleted_at IS NULL;
+            )
         `);
+        await driver.execute('CREATE INDEX idx_companies_name ON companies (name) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_companies_industry ON companies (industry) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_companies_city ON companies (city) WHERE deleted_at IS NULL');
     },
     async down(driver) {
         await driver.execute('DROP TABLE IF EXISTS companies CASCADE');

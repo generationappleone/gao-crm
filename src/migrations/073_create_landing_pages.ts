@@ -1,0 +1,6 @@
+import type { Migration, DatabaseDriver } from '@gao/orm';
+export const CreateLandingPagesTable: Migration = {
+    name: '073_create_landing_pages',
+    async up(d: DatabaseDriver) { await d.execute(`CREATE TABLE landing_pages ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), title VARCHAR(300) NOT NULL, slug VARCHAR(300) NOT NULL UNIQUE, description TEXT, template VARCHAR(50) NOT NULL DEFAULT 'blank', status VARCHAR(20) NOT NULL DEFAULT 'draft', sections JSONB, seo_title VARCHAR(300), seo_description TEXT, custom_css TEXT, form_id UUID REFERENCES forms(id) ON DELETE SET NULL, chat_enabled BOOLEAN NOT NULL DEFAULT false, total_views INTEGER NOT NULL DEFAULT 0, total_conversions INTEGER NOT NULL DEFAULT 0, published_at TIMESTAMPTZ, created_by UUID REFERENCES users(id) ON DELETE SET NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), deleted_at TIMESTAMPTZ, CONSTRAINT ck_lp_status CHECK (status IN ('draft', 'published', 'archived')) )`); await d.execute('CREATE INDEX idx_lp_slug ON landing_pages (slug) WHERE deleted_at IS NULL'); await d.execute('CREATE INDEX idx_lp_status ON landing_pages (status) WHERE deleted_at IS NULL'); },
+    async down(d: DatabaseDriver) { await d.execute('DROP TABLE IF EXISTS landing_pages CASCADE'); },
+};

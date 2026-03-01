@@ -1,7 +1,7 @@
 import { Company } from '../models/company.model.js';
 export class CompanyService {
     async list(params, search) {
-        let query = Company.where('id', '!=', '').whereNull('deleted_at');
+        let query = Company.where('deleted_at', 'IS', null);
         if (search) {
             query = query.where('name', 'LIKE', `%${search}%`);
         }

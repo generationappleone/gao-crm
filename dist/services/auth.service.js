@@ -5,7 +5,11 @@
  */
 import { JwtService, hashPassword, verifyPassword } from '@gao/security';
 import { User } from '../models/user.model.js';
-const JWT_SECRET = process.env.JWT_SECRET ?? 'gao-crm-dev-secret-change-in-production';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const JWT_SECRET = process.env.JWT_SECRET ?? (IS_PRODUCTION ? '' : 'gao-crm-dev-secret-change-in-production');
+if (!JWT_SECRET) {
+    throw new Error('FATAL: JWT_SECRET environment variable is required in production');
+}
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 const jwt = new JwtService({
     secretKey,
@@ -21,7 +25,7 @@ export class AuthService {
         if (!user.is_active) {
             throw new Error('Account is deactivated');
         }
-        const isValid = await verifyPassword(password, user.password);
+        const isValid = await verifyPassword(user.password, password);
         if (!isValid) {
             throw new Error('Invalid email or password');
         }

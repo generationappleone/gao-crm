@@ -1,1 +1,1 @@
-{"version":3,"file":"007_create_notes.d.ts","sourceRoot":"","sources":["../../src/migrations/007_create_notes.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAkB,MAAM,UAAU,CAAC;AAE1D,eAAO,MAAM,gBAAgB,EAAE,SA2B9B,CAAC"}
+{"version":3,"file":"007_create_notes.d.ts","sourceRoot":"","sources":["../../src/migrations/007_create_notes.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAkB,MAAM,UAAU,CAAC;AAE1D,eAAO,MAAM,gBAAgB,EAAE,SA0B9B,CAAC"}

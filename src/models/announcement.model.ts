@@ -1,0 +1,2 @@
+import { Model, Table, Column } from '@gao/orm';
+@Table('announcements') export class Announcement extends Model { @Column() declare id: string; @Column() author_id!: string; @Column() title!: string; @Column() content!: string; @Column() is_pinned!: boolean; @Column() published_at?: string; @Column() expires_at?: string; @Column() declare created_at: string; @Column() declare updated_at: string; @Column() declare deleted_at: string | undefined; }

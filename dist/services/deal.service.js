@@ -2,7 +2,7 @@ import { Deal } from '../models/deal.model.js';
 import { DealStage } from '../models/deal-stage.model.js';
 export class DealService {
     async list(params, stageId, ownerId) {
-        let query = Deal.where('id', '!=', '').whereNull('deleted_at');
+        let query = Deal.where('deleted_at', 'IS', null);
         if (stageId) {
             query = query.where('stage_id', stageId);
         }
@@ -65,7 +65,7 @@ export class DealService {
         return true;
     }
     async getStages() {
-        return DealStage.where('id', '!=', '').orderBy('display_order', 'ASC').get();
+        return DealStage.where('id', 'IS NOT', null).orderBy('display_order', 'ASC').get();
     }
 }
 //# sourceMappingURL=deal.service.js.map

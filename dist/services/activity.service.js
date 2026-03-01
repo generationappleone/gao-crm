@@ -1,7 +1,7 @@
 import { Activity } from '../models/activity.model.js';
 export class ActivityService {
     async list(params, type, contactId, dealId) {
-        let query = Activity.where('id', '!=', '').whereNull('deleted_at');
+        let query = Activity.where('deleted_at', 'IS', null);
         if (type) {
             query = query.where('type', type);
         }
@@ -56,7 +56,7 @@ export class ActivityService {
         return true;
     }
     async getRecent(limit = 10) {
-        return Activity.where('id', '!=', '').whereNull('deleted_at')
+        return Activity.where('deleted_at', 'IS', null)
             .orderBy('created_at', 'DESC')
             .limit(limit)
             .get();

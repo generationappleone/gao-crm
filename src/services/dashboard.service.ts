@@ -3,6 +3,9 @@ import { Deal } from '../models/deal.model.js';
 import { DealStage } from '../models/deal-stage.model.js';
 import { Activity } from '../models/activity.model.js';
 import { Company } from '../models/company.model.js';
+import { EmailMessage } from '../models/email-message.model.js';
+import { Quotation } from '../models/quotation.model.js';
+import { CalendarEvent } from '../models/calendar-event.model.js';
 
 export interface DashboardStats {
     totalContacts: number;
@@ -16,6 +19,14 @@ export interface DashboardStats {
     pendingActivities: number;
     pipeline: Array<{ name: string; slug: string; color: string; count: number; value: number }>;
     recentActivities: Activity[];
+    // Phase 2 enhancements
+    emailsSent: number;
+    emailsOpened: number;
+    emailOpenRate: number;
+    quotationsSent: number;
+    quotationsAccepted: number;
+    quotationValue: number;
+    upcomingEvents: number;
 }
 
 export class DashboardService {
@@ -61,6 +72,47 @@ export class DashboardService {
             )
             .slice(0, 10);
 
+        // Phase 2: Email stats (graceful if tables don't exist yet)
+        let sentEmailsCount = 0;
+        let openedEmailsCount = 0;
+        let emailOpenRate = 0;
+        let quotationsSentCount = 0;
+        let quotationsAcceptedCount = 0;
+        let quotationValue = 0;
+        let upcomingEventsCount = 0;
+
+        try {
+            const emails = await EmailMessage.where('deleted_at', 'IS', null).get();
+            const sentEmails = emails.filter((e) => e.status === 'sent' || e.status === 'delivered');
+            const openedEmails = sentEmails.filter((e) => e.open_count > 0);
+            sentEmailsCount = sentEmails.length;
+            openedEmailsCount = openedEmails.length;
+            emailOpenRate = sentEmails.length > 0
+                ? Math.round((openedEmails.length / sentEmails.length) * 100)
+                : 0;
+        } catch { /* table may not exist */ }
+
+        try {
+            const quotations = await Quotation.where('deleted_at', 'IS', null).get();
+            const sentQuotes = quotations.filter((q) => q.status !== 'draft');
+            const acceptedQuotes = quotations.filter((q) => q.status === 'accepted');
+            quotationsSentCount = sentQuotes.length;
+            quotationsAcceptedCount = acceptedQuotes.length;
+            quotationValue = acceptedQuotes.reduce((sum, q) => sum + Number(q.total_amount), 0);
+        } catch { /* table may not exist */ }
+
+        try {
+            const now = new Date().toISOString();
+            const sevenDays = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+            const upcomingEvents = await CalendarEvent
+                .where('deleted_at', 'IS', null)
+                .where('start_at', '>=', now)
+                .where('start_at', '<=', sevenDays)
+                .where('status', '!=', 'cancelled')
+                .get();
+            upcomingEventsCount = upcomingEvents.length;
+        } catch { /* table may not exist */ }
+
         return {
             totalContacts: contacts.length,
             totalCompanies: companies.length,
@@ -73,6 +125,14 @@ export class DashboardService {
             pendingActivities,
             pipeline,
             recentActivities,
+            // Phase 2
+            emailsSent: sentEmailsCount,
+            emailsOpened: openedEmailsCount,
+            emailOpenRate,
+            quotationsSent: quotationsSentCount,
+            quotationsAccepted: quotationsAcceptedCount,
+            quotationValue,
+            upcomingEvents: upcomingEventsCount,
         };
     }
 }

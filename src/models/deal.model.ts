@@ -6,11 +6,13 @@ export class Deal extends Model {
     @Column() contact_id!: string;
     @Column() company_id?: string;
     @Column() owner_id!: string;
+    @Column() pipeline_id!: string;
     @Column() stage_id!: string;
     @Column() title!: string;
     @Column() value!: number;
     @Column() currency!: string;
     @Column() probability!: number;
+    @Column() position!: number;
     @Column() expected_close_at?: string;
     @Column() won_at?: string;
     @Column() lost_at?: string;

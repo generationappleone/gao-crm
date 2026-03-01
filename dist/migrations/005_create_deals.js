@@ -23,16 +23,15 @@ export const CreateDealsTable = {
 
                 CONSTRAINT ck_deals_value CHECK (value >= 0),
                 CONSTRAINT ck_deals_probability CHECK (probability >= 0 AND probability <= 100)
-            );
-
-            CREATE INDEX idx_deals_contact ON deals (contact_id) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_deals_company ON deals (company_id) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_deals_owner ON deals (owner_id) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_deals_stage ON deals (stage_id) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_deals_title ON deals (title) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_deals_expected_close ON deals (expected_close_at) WHERE deleted_at IS NULL;
-            CREATE INDEX idx_deals_created ON deals (created_at DESC) WHERE deleted_at IS NULL;
+            )
         `);
+        await driver.execute('CREATE INDEX idx_deals_contact ON deals (contact_id) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_deals_company ON deals (company_id) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_deals_owner ON deals (owner_id) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_deals_stage ON deals (stage_id) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_deals_title ON deals (title) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_deals_expected_close ON deals (expected_close_at) WHERE deleted_at IS NULL');
+        await driver.execute('CREATE INDEX idx_deals_created ON deals (created_at DESC) WHERE deleted_at IS NULL');
     },
     async down(driver) {
         await driver.execute('DROP TABLE IF EXISTS deals CASCADE');

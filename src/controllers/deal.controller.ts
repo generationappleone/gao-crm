@@ -6,9 +6,13 @@ import { ActivityService } from '../services/activity.service.js';
 import { NoteService } from '../services/note.service.js';
 import { ContactService } from '../services/contact.service.js';
 import { CompanyService } from '../services/company.service.js';
+import { url } from '../helpers/url.js';
 import { parsePagination, renderPaginationHtml } from '../helpers/pagination.js';
 import { escapeHtml } from '../helpers/escape.js';
 import { formatCurrency, timeAgo } from '../helpers/format.js';
+import { FileModel } from '../models/file.model.js';
+import { FileAttachment } from '../models/file-attachment.model.js';
+import { User } from '../models/user.model.js';
 
 const dealService = new DealService();
 const activityService = new ActivityService();
@@ -137,7 +141,7 @@ export class DealController {
     @Get('/:id')
     async detail(req: GaoRequest, res: GaoResponse) {
         const deal = await dealService.findById(req.params.id);
-        if (!deal) return res.redirect('/deals');
+        if (!deal) return res.redirect(url('/deals'));
         const stages = await dealService.getStages();
         const stageMap = new Map(stages.map(s => [s.id, s]));
         const currentStage = stageMap.get(deal.stage_id);
@@ -147,6 +151,50 @@ export class DealController {
         const activities = await activityService.list({ page: 1, perPage: 50 }, undefined, undefined, deal.id);
         const dealActivities = activities.activities.slice(0, 10);
         const notes = await noteService.listByNotable('deal', deal.id);
+
+        // File attachments for the deal itself
+        const fileAttachments = await FileAttachment.where('entity_type', 'deal').where('entity_id', deal.id).get();
+        const fileIds = fileAttachments.map(fa => fa.file_id);
+        const files = fileIds.length > 0
+            ? await Promise.all(fileIds.map(fid => FileModel.where('id', fid).whereNull('deleted_at').first()))
+            : [];
+        const validFiles = files.filter(Boolean);
+        const attachmentsHtml = validFiles.length > 0 ? validFiles.map(f => {
+            if (!f) return '';
+            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(100,116,139,0.15);">
+                <span style="font-size:18px;">${f.mime_type?.startsWith('image/') ? '🖼️' : f.mime_type?.includes('pdf') ? '📄' : '📎'}</span>
+                <div style="flex:1;min-width:0;">
+                    <a href="/api/files/${f.id}/download" target="_blank" style="font-size:13px;font-weight:600;color:#818cf8;text-decoration:none;" title="${escapeHtml(f.original_name)}">${escapeHtml(f.original_name)}</a>
+                    <div style="font-size:11px;color:var(--gao-text-muted,#64748b);margin-top:2px;">${Math.round(f.file_size / 1024)} KB · ${timeAgo(f.created_at)}</div>
+                </div>
+                <button onclick="if(confirm('Delete this file?'))fetch('/api/files/${f.id}',{method:'DELETE'}).then(r=>{if(r.ok)window.location.reload();else showToast('Delete failed','error')})" style="padding:4px 8px;background:rgba(239,68,68,0.12);color:#ef4444;border:none;border-radius:6px;font-size:11px;cursor:pointer;">🗑</button>
+            </div>`;
+        }).join('') : '<p style="color:var(--gao-text-muted,#64748b);font-size:13px;padding:12px 0;">No attachments yet</p>';
+
+        // Build comment attachment map (files attached to each note/comment)
+        const noteIds = notes.map(n => n.id);
+        const commentAttachments: Map<string, { id: string; name: string; original_name: string; mime_type?: string; file_size: number }[]> = new Map();
+        if (noteIds.length > 0) {
+            for (const nid of noteIds) {
+                const nAttachments = await FileAttachment.where('entity_type', 'note').where('entity_id', nid).get();
+                if (nAttachments.length > 0) {
+                    const nFileIds = nAttachments.map(a => a.file_id);
+                    const nFiles = await Promise.all(nFileIds.map(fid => FileModel.where('id', fid).whereNull('deleted_at').first()));
+                    const validNFiles = nFiles.filter(Boolean) as FileModel[];
+                    if (validNFiles.length > 0) {
+                        commentAttachments.set(nid, validNFiles.map(f => ({ id: f.id, name: f.name, original_name: f.original_name, mime_type: f.mime_type, file_size: f.file_size })));
+                    }
+                }
+            }
+        }
+
+        // Fetch authors for notes
+        const authorIds = [...new Set(notes.map(n => n.author_id).filter(Boolean))];
+        const authorMap = new Map<string, { name: string; role: string }>();
+        for (const aid of authorIds) {
+            const author = await User.find(aid);
+            if (author) authorMap.set(aid, { name: author.name, role: author.role });
+        }
 
         // Contact & Company
         let contactHtml = '—';
@@ -180,13 +228,33 @@ export class DealController {
             </div>`;
         }).join('') : '<p style="color:var(--gao-text-muted,#64748b);font-size:13px;padding:12px 0;">No activities yet</p>';
 
-        // Notes
-        const notesHtml = notes.length > 0 ? notes.map(n =>
-            `<div style="padding:12px 0;border-bottom:1px solid rgba(100,116,139,0.15);">
-                <p style="font-size:14px;line-height:1.6;margin:0;">${escapeHtml(n.content)}</p>
-                <div style="font-size:12px;color:var(--gao-text-muted,#64748b);margin-top:6px;">${timeAgo(n.created_at)}</div>
-            </div>`
-        ).join('') : '<p style="color:var(--gao-text-muted,#64748b);font-size:13px;padding:12px 0;">No notes yet</p>';
+        // Notes/Comments — upgraded thread
+        const notesHtml = notes.length > 0 ? notes.map(n => {
+            const author = authorMap.get(n.author_id);
+            const authorName = author?.name ?? 'Unknown';
+            const authorInitials = authorName.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+            const cFiles = commentAttachments.get(n.id) ?? [];
+            const cFilesHtml = cFiles.length > 0 ? cFiles.map(cf =>
+                `<a href="/api/files/${cf.id}/download" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);border-radius:6px;font-size:11px;color:#818cf8;text-decoration:none;margin-right:6px;margin-top:6px;"
+                    title="${escapeHtml(cf.original_name)}">
+                    ${cf.mime_type?.startsWith('image/') ? '🖼️' : cf.mime_type?.includes('pdf') ? '📄' : '📎'}
+                    <span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(cf.original_name)}</span>
+                    <span style="color:var(--gao-text-muted,#64748b);">${Math.round(cf.file_size / 1024)}KB</span>
+                </a>`
+            ).join('') : '';
+            return `<div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(100,116,139,0.1);">
+                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;">${authorInitials}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                        <span style="font-size:13px;font-weight:700;color:#e2e8f0;">${escapeHtml(authorName)}</span>
+                        <span style="font-size:11px;color:var(--gao-text-muted,#64748b);">${timeAgo(n.created_at)}</span>
+                    </div>
+                    <p style="font-size:13px;line-height:1.6;margin:0;color:#cbd5e1;">${escapeHtml(n.content)}</p>
+                    ${cFilesHtml ? `<div style="margin-top:4px;display:flex;flex-wrap:wrap;">${cFilesHtml}</div>` : ''}
+                </div>
+                <button onclick="if(confirm('Delete this comment?'))fetch('/api/notes/${n.id}',{method:'DELETE'}).then(r=>{if(r.ok)window.location.reload()})" style="padding:2px 6px;background:none;border:none;color:var(--gao-text-muted,#64748b);font-size:12px;cursor:pointer;opacity:0.5;" title="Delete">🗑</button>
+            </div>`;
+        }).join('') : '<p style="color:var(--gao-text-muted,#64748b);font-size:13px;padding:12px 0;">No comments yet. Be the first to comment!</p>';
 
         const content = `
         <div style="padding:8px;">
@@ -197,8 +265,17 @@ export class DealController {
                 </div>
                 <div style="display:flex;gap:10px;align-items:center;">
                     <a href="/deals/${deal.id}/edit" style="padding:8px 18px;background:rgba(255,255,255,0.08);color:#e2e8f0;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600;">✏️ Edit</a>
+                    <button onclick="if(confirm('Delete this deal?'))fetch('/api/deals/${deal.id}',{method:'DELETE'}).then(()=>window.location='/deals')" style="padding:8px 14px;background:rgba(239,68,68,0.15);color:#ef4444;border:none;border-radius:8px;font-size:13px;cursor:pointer;">🗑</button>
                     <span style="padding:6px 14px;border-radius:12px;font-size:12px;font-weight:700;color:#fff;background:${currentStage?.color ?? '#6366f1'}">${escapeHtml(currentStage?.name ?? '—')}</span>
                 </div>
+            </div>
+
+            <!-- Quick Actions Bar -->
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                <a href="/quotations/create?deal_id=${deal.id}" style="padding:6px 14px;background:rgba(34,197,94,0.12);color:#22c55e;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;">📋 Create Quotation</a>
+                <a href="/activities/create?deal_id=${deal.id}" style="padding:6px 14px;background:rgba(59,130,246,0.12);color:#3b82f6;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;">📞 Log Activity</a>
+                <button onclick="if(confirm('Mark this deal as Won?'))fetch('/api/deals/${deal.id}',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({won_at:new Date().toISOString(),probability:100})}).then(()=>window.location.reload())" style="padding:6px 14px;background:rgba(34,197,94,0.12);color:#22c55e;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">🏆 Mark Won</button>
+                <button onclick="const reason=prompt('Reason for losing this deal?');if(reason!==null)fetch('/api/deals/${deal.id}',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({lost_at:new Date().toISOString(),lost_reason:reason})}).then(()=>window.location.reload())" style="padding:6px 14px;background:rgba(239,68,68,0.12);color:#ef4444;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">❌ Mark Lost</button>
             </div>
 
             <div style="display:flex;gap:4px;margin-bottom:24px;">${pipelineHtml}</div>
@@ -224,26 +301,89 @@ export class DealController {
 
             <div class="gao-card" style="padding:24px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                    <h3 style="font-size:15px;font-weight:700;">Notes</h3>
+                    <h3 style="font-size:15px;font-weight:700;">💬 Notes & Comments <span style="font-size:12px;color:var(--gao-text-muted,#64748b);font-weight:400;">(${notes.length})</span></h3>
                 </div>
                 ${notesHtml}
                 <form id="addNoteForm" style="margin-top:16px;">
-                    <textarea name="content" placeholder="Add a note..." rows="2" required style="${inputStyle}resize:vertical;font-size:13px;"></textarea>
-                    <button type="submit" style="margin-top:8px;padding:8px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Add Note</button>
+                    <textarea name="content" placeholder="Write a comment or note..." rows="3" required style="${inputStyle}resize:vertical;font-size:13px;"></textarea>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+                        <button type="submit" style="padding:8px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">💬 Add Comment</button>
+                        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(100,116,139,0.25);border-radius:8px;cursor:pointer;font-size:12px;color:var(--gao-text-muted,#94a3b8);transition:all 0.2s;"
+                               onmouseover="this.style.borderColor='rgba(99,102,241,0.3)'" onmouseout="this.style.borderColor='rgba(100,116,139,0.25)'">
+                            📎 <span id="commentFileLabel">Attach file</span>
+                            <input type="file" name="commentFile" id="commentFileInput" style="display:none;" onchange="document.getElementById('commentFileLabel').textContent=this.files[0]?.name||'Attach file'" />
+                        </label>
+                    </div>
+                </form>
+            </div>
+
+            <!-- File Attachments -->
+            <div class="gao-card" style="padding:24px;margin-top:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h3 style="font-size:15px;font-weight:700;">📎 Attachments</h3>
+                </div>
+                <div id="fileList">${attachmentsHtml}</div>
+                <form id="uploadForm" style="margin-top:16px;" enctype="multipart/form-data">
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(255,255,255,0.04);border:2px dashed rgba(100,116,139,0.3);border-radius:10px;cursor:pointer;transition:all 0.2s;" 
+                               onmouseover="this.style.borderColor='rgba(99,102,241,0.4)'" onmouseout="this.style.borderColor='rgba(100,116,139,0.3)'">
+                            <span style="font-size:18px;">📁</span>
+                            <span style="font-size:13px;color:var(--gao-text-muted,#64748b);" id="fileLabel">Choose file or drag here...</span>
+                            <input type="file" name="file" id="fileInput" style="display:none;" onchange="document.getElementById('fileLabel').textContent=this.files[0]?.name||'Choose file...'" />
+                        </label>
+                        <button type="submit" style="padding:10px 20px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">⬆️ Upload</button>
+                    </div>
                 </form>
             </div>
         </div>
         <script>
+            // Note/Comment submission with optional file attachment
             document.getElementById('addNoteForm')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const content = new FormData(e.target).get('content');
-                const res = await fetch('/api/notes', {
+                if (!content) return;
+                const commentFileInput = document.getElementById('commentFileInput');
+                const hasFile = commentFileInput && commentFileInput.files && commentFileInput.files[0];
+
+                // Step 1: Create the note/comment
+                const noteRes = await fetch('/api/notes', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ notable_type: 'deal', notable_id: '${deal.id}', content }),
+                    body: JSON.stringify({ notable_type: 'deal', notable_id: '${deal.id}', author_id: '${user?.id ?? ''}', content }),
                 });
-                if (res.ok) { window.location.reload(); }
-                else { const err = await res.json(); alert(err.error?.message || 'Failed'); }
+                if (!noteRes.ok) {
+                    const err = await noteRes.json();
+                    showToast(err.error?.message || 'Failed to add comment', 'error');
+                    return;
+                }
+                const noteData = await noteRes.json();
+
+                // Step 2: Upload file attached to this comment (if any)
+                if (hasFile) {
+                    const noteId = noteData.data?.id || noteData.id;
+                    const formData = new FormData();
+                    formData.append('file', commentFileInput.files[0]);
+                    formData.append('entity_type', 'note');
+                    formData.append('entity_id', noteId);
+                    await fetch('/api/files/upload', { method: 'POST', body: formData });
+                }
+
+                showToast('Comment added!', 'success');
+                setTimeout(() => window.location.reload(), 400);
+            });
+
+            // File upload
+            document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('fileInput');
+                if (!fileInput.files || !fileInput.files[0]) { showToast('Please select a file', 'error'); return; }
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('entity_type', 'deal');
+                formData.append('entity_id', '${deal.id}');
+                const res = await fetch('/api/files/upload', { method: 'POST', body: formData });
+                if (res.ok) { showToast('File uploaded!', 'success'); setTimeout(() => window.location.reload(), 600); }
+                else { const err = await res.json().catch(() => ({})); showToast(err.error?.message || 'Upload failed', 'error'); }
             });
         </script>`;
 
@@ -253,7 +393,7 @@ export class DealController {
     @Get('/:id/edit')
     async editForm(req: GaoRequest, res: GaoResponse) {
         const deal = await dealService.findById(req.params.id);
-        if (!deal) return res.redirect('/deals');
+        if (!deal) return res.redirect(url('/deals'));
         const user = req.user as Record<string, unknown>;
         const stages = await dealService.getStages();
         const contacts = await contactService.list({ page: 1, perPage: 200 });

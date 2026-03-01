@@ -12,16 +12,19 @@ let Deal = class Deal extends Model {
     contact_id;
     company_id;
     owner_id;
+    pipeline_id;
     stage_id;
     title;
     value;
     currency;
     probability;
+    position;
     expected_close_at;
     won_at;
     lost_at;
     lost_reason;
     description;
+    notes;
 };
 __decorate([
     Column(),
@@ -39,6 +42,10 @@ __decorate([
     Column(),
     __metadata("design:type", String)
 ], Deal.prototype, "owner_id", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Deal.prototype, "pipeline_id", void 0);
 __decorate([
     Column(),
     __metadata("design:type", String)
@@ -61,6 +68,10 @@ __decorate([
 ], Deal.prototype, "probability", void 0);
 __decorate([
     Column(),
+    __metadata("design:type", Number)
+], Deal.prototype, "position", void 0);
+__decorate([
+    Column(),
     __metadata("design:type", String)
 ], Deal.prototype, "expected_close_at", void 0);
 __decorate([
@@ -79,6 +90,10 @@ __decorate([
     Column(),
     __metadata("design:type", String)
 ], Deal.prototype, "description", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], Deal.prototype, "notes", void 0);
 __decorate([
     Column(),
     __metadata("design:type", String)

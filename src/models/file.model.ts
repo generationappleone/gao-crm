@@ -1,0 +1,2 @@
+import { Model, Table, Column } from '@gao/orm';
+@Table('files') export class FileModel extends Model { @Column() declare id: string; @Column() uploaded_by!: string; @Column() name!: string; @Column() original_name!: string; @Column() file_path!: string; @Column() mime_type?: string; @Column() file_size!: number; @Column() storage!: string; @Column() is_public!: boolean; @Column() declare created_at: string; @Column() declare deleted_at: string | undefined; }

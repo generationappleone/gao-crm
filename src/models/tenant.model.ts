@@ -1,0 +1,2 @@
+import { Model, Table, Column } from '@gao/orm';
+@Table('tenants') export class Tenant extends Model { @Column() declare id: string; @Column() name!: string; @Column() slug!: string; @Column() domain?: string; @Column() logo_url?: string; @Column() settings!: string; @Column() plan!: string; @Column() max_users!: number; @Column() is_active!: boolean; @Column() trial_ends_at?: string; @Column() declare created_at: string; @Column() declare updated_at: string; }
